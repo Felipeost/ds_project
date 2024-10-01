@@ -67,7 +67,7 @@ df = df[df['name']!='Övrigt']
 
 # Load credentials
 credentials = service_account.Credentials.from_service_account_file(
-    "C:\\Users\\lalka\\OneDrive\\Skrivbord\\Studier\\Projekt\\crime-in-sweden-project-811e550bf4e4.json"
+    "C:\\Users\\lalka\\OneDrive\\Skrivbord\\Studier\\Projekt\\working repo\\ds_project\\crime-in-sweden-project-47eef163c346.json"
 ) # Chage to your own path to JSON key
 
 # Set up BigQuery Client with credentials

@@ -1,6 +1,6 @@
 @echo off
-REM Activate the Anaconda environment (if applicable)
-CALL "C:\Users\lalka\anaconda3\Scripts\activate.bat" base
+REM Activate the virtual environment
+CALL "C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\env\Scripts\activate.bat"
 
 REM Run the Python script
 python "C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\etl_polis_data.py"

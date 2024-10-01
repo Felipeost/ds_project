@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\env
+set VIRTUAL_ENV=C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\env
 
 if not defined PROMPT set PROMPT=$P$G
 
