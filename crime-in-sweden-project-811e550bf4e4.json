@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "crime-in-sweden-project",
+  "private_key_id": "811e550bf4e4a95093dd6492fc2bbaa60db663a1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAeKWTWIrY7IWt\nZFB0s3McNbhjfZsXK0gzS2djBNWiwhdrAREhfs6pV9YxEqrSxjUIS1VAt/6YVu0J\naLwh60EtNwBZUu9hjJd0kyKXM0YhUdZW5T5Ijoba8rAS+iyRjs7UlhK68tz7IdDD\nsnyqeUKY6UN/amc4YfSsAE3BAHsw3sXR9BYBH+H8G6j0MHtFf5LFHYNMhF7WaIOZ\nfk2nJEX1XnQ8izNoSMvaHpiVAFYE3ifwuVx7XS+YAdLCH2xyMrBoxXUCgYIWisc9\nXn2xExzcSMe++Ue8sYQLlJMt9FRB1s+JX5M0YIx65lEC8ufPG4gmaZJ7fm9OV9Az\n3QRlV4ObAgMBAAECggEABAL/wIB59GeJqcGLg8MxxQbBnyFBGEyIprkNoJy7LzdI\ncayGBOK1wAXaqw8ujFIhTNj1H/I11ksJicarFTHoG98nnLUD1E6v4XgnomspLQyd\noRYKJE0ENpAUZ3DbePU3DmtKXKcvP/TGey2/N3ZrkvBZvdAj8qLoDKW8+SbfandQ\n+ENaUuM4LiJdenuTlh+kIwOg0U4dQpPd6h7upaWapfhyFnLqflcu7AOp0tawy8Wp\nCPIi8dtw6uVVqwJUgn3H6aFsKAV0aKM4X1w9msjEjw+iIyPaSA5arYonYe5tr5GJ\nYQXbCpZ2WCzAAJvVQbLvVrxOoaePC6qgEpm52C4xkQKBgQDpnIR7XKYvukAkjmDh\nPKmpPLkXLfp/zIW3xGxcq7X6t2cXaDKoe1aq921jEicT7y3k0fs/fptFoq0E0gND\nLCVcU/bPhRBsiEHGuSt+CU6wOeTPMcxGUFUgSAXLdAZ6PdZYd4qBkWz+X3NtVVAk\nBuBx0ksartuQIR3K++ymCkwITwKBgQDS6slzPdxyqNR33q3a7x4z/6DMpaw/nJpd\nQ3t+7ePuXf7ZGd+szGW11pagnV1DH1knRSEV3fM+mpQK9/tEezi7RCikeERmf7yh\nlDORRF742RPpCf3jFIja+cAVTCSlirTzB3sZzKYrCUChdLHIXh8oAbnCxRqumHxp\ncJL0rL9w9QKBgAL7ycFdlI3Ffi45V0lpIe2UZfTC1JEvRoHrU0r3snJKR1nILeVy\n9c9nK5F5WOBrTJXAjMnpzwfbpQQLvpjsBmogdGWAGI6aSuTD1qdcbRHZG2/9/dLk\nEcJAyToo+DA1e/hTRoSTG+Y/x9Sco1JieBlcCzODCjDUC3JdN0+DkCcHAoGBAI9g\nyfcMO3q6aEzgVGE7IdYJVT8o9HH9vDXgNOhxQPv+a8sbuqDWBeJZ8OVYdFi3y7xV\nUwtxaPTK0g6uyuGfvk4XJGXB2AWxmgJhI7kBuGoD73QAtdWTVQE+vCP+Mf9SznVT\nRYyhQOiKjqPzFxP1X8qreaL8qIm94P0waMXpVO6tAoGBANCN8dqrL5KyFewZllXX\njhzQVruHGjbyD6SXZqIO+Or4MSk4DKq19YVViTkJBkoyy0aIsj9MYUpvu9HBI43m\np8g6QKIGgUXeY0kzUA/mcTYmc0luusMwig8IBXXqsCEifDj5Apt1TFjRmxzStnhI\nUFCcX0YsTlW0laLRJw1dENkh\n-----END PRIVATE KEY-----\n",
+  "client_email": "bigquery-access@crime-in-sweden-project.iam.gserviceaccount.com",
+  "client_id": "101773053233523577266",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bigquery-access%40crime-in-sweden-project.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
