@@ -62,9 +62,9 @@ def transform_data(data):
         df['date'] = pd.to_datetime(df['date'])
         df['time'] = pd.to_datetime(df['time'], format='%H:%M:%S')
 
-        df = df[df['name'] != 'Sammanfattning natt']
-        df = df[df['name'] != 'Sammanfattning kväll och natt']
-        df = df[df['name'] != 'Övrigt']
+        df = df[df['type'] != 'Sammanfattning natt']
+        df = df[df['type'] != 'Sammanfattning kväll och natt']
+        df = df[df['type'] != 'Övrigt']
 
         logging.info("Data transformation completed successfully.")
         return df
