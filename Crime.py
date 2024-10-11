@@ -5,18 +5,14 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 
-# Load credentials from the JSON key file
 credentials = service_account.Credentials.from_service_account_file(
     r"C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\crime-in-sweden-project-47eef163c346.json"
 )
 
-# Initialize BigQuery client
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
-# Create tabs
 tabs = st.tabs(["Händelser", "Väder"])
 
-# Crime Tab
 with tabs[0]:
     st.header("Händelser i Sverige rapporterade av Polisen")
     
@@ -34,7 +30,7 @@ with tabs[0]:
     """
     
     df = client.query(query).to_dataframe()
-    
+
     def categorize_event(event_type):
         trafik = [
             'Trafikbrott', 'Trafikhinder', 'Trafikkontroll', 'Trafikolycka', 
@@ -91,7 +87,6 @@ with tabs[0]:
         (df['date'] <= end_date)
     ]
 
-    # Create a new map for the filtered data
     filtered_map = folium.Map(location=[61.0, 15.0], zoom_start=5)
     
     icon_mapping = {
@@ -104,25 +99,45 @@ with tabs[0]:
         'Ovrigt': None
     }
 
-    # Add markers for each event
-    for _, row in filtered_df.iterrows():
-        icon_name, icon_color = icon_mapping.get(row['main_categories'], ('info-circle', 'blue'))
+    if 'clicked_location' not in st.session_state:
+        st.session_state['clicked_location'] = None
+
+    event_counts = filtered_df.groupby(['latitude', 'longitude']).size().reset_index(name='count')
+    
+    for _, row in event_counts.iterrows():
+        count = int(row['count'])
+        lat = row['latitude']
+        lon = row['longitude']
+        
+        event_category = filtered_df[(filtered_df['latitude'] == lat) & (filtered_df['longitude'] == lon)]['main_categories'].values[0]
+        icon_name, icon_color = icon_mapping.get(event_category, ('info-circle', 'blue'))
+        
         folium.Marker(
-            location=[row['latitude'], row['longitude']],
+            location=[lat, lon],
             icon=folium.Icon(icon=icon_name, prefix='fa', color=icon_color),
-            popup=folium.Popup(
-                html=f"""
-                <div style="width: 200px; white-space: normal;">
-                    <strong>Län:</strong> {row['location_name']}<br>
-                    <strong>Händelse:</strong> {row['name']}<br>
-                    <strong>Datum:</strong> {row['date']}<br>
-                    <strong>Tid:</strong> {row['time']}<br>
-                    {row['summary']}<br>
-                </div>
-                """,
-                max_width=200
-            ),
+            tooltip=f"Antal: {count}",
         ).add_to(filtered_map)
 
-    # Display the updated map
-    st_folium(filtered_map, width=1000, height=700)
+    clicked_data = st_folium(filtered_map, width=1000, height=700)
+    
+    if clicked_data and clicked_data['last_object_clicked']:
+        clicked_lat = clicked_data['last_object_clicked']['lat']
+        clicked_lon = clicked_data['last_object_clicked']['lng']
+        
+        events_at_location = filtered_df[(filtered_df['latitude'] == clicked_lat) & (filtered_df['longitude'] == clicked_lon)]
+
+        if not events_at_location.empty:
+            events_at_location = events_at_location.sort_values(by='date', ascending=False)
+
+            st.sidebar.subheader("Information")
+            for _, event in events_at_location.iterrows():
+                st.sidebar.markdown(f"""
+                <div style="width: 200px; white-space: normal; margin-bottom: 10px;">
+                    <strong>Län:</strong> {event['location_name']}<br>
+                    <strong>Händelse:</strong> {event['name']}<br>
+                    <strong>Datum:</strong> {event['date']}<br>
+                    <strong>Tid:</strong> {event['time']}<br>
+                    {event['summary']}<br>
+                </div>
+                <hr style="border: 1px solid #ccc;">
+                """, unsafe_allow_html=True)
