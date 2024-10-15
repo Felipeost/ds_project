@@ -1,0 +1,7 @@
+[theme]
+primaryColor = "#1E1E1E"  # Dark primary color
+backgroundColor = "#333333"  # Black background
+secondaryBackgroundColor = "#000000"  # Dark gray for sidebar and other elements
+textColor = "#FFFFFF"  # White text
+font = "san-serif"  # You can choose a different font if desired
+
