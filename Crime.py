@@ -4,6 +4,10 @@ from google.cloud import bigquery
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+from pyecharts.charts import Bar, Line
+from pyecharts import options as opts
+from streamlit_echarts import st_pyecharts
+from pyecharts.commons.utils import JsCode
 
 credentials = service_account.Credentials.from_service_account_file(
     r"C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\crime-in-sweden-project-47eef163c346.json"
@@ -11,7 +15,9 @@ credentials = service_account.Credentials.from_service_account_file(
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
-tabs = st.tabs(["Händelser", "Väder"])
+st.set_page_config(layout="wide")
+
+tabs = st.tabs(["Händelser", "Analys"])
 
 with tabs[0]:
     st.header("Händelser i Sverige rapporterade av Polisen")
@@ -110,7 +116,7 @@ with tabs[0]:
         lon = row['longitude']
         
         event_category = filtered_df[(filtered_df['latitude'] == lat) & (filtered_df['longitude'] == lon)]['main_categories'].values[0]
-        icon_name, icon_color = icon_mapping.get(event_category, ('info-circle', 'blue'))
+        icon_name, icon_color = icon_mapping.get(event_category, ('info-circle', 'green'))
         
         folium.Marker(
             location=[lat, lon],
@@ -141,3 +147,98 @@ with tabs[0]:
                 </div>
                 <hr style="border: 1px solid #ccc;">
                 """, unsafe_allow_html=True)
+
+with tabs[1]:
+    st.header("Analys av Polisens Rapporterade Händelser i Sverige")
+
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Top 3 Mest Rapporterade Händelser")
+        
+        top_incidents = (filtered_df['name']
+                         .value_counts()
+                         .nlargest(5)
+                         .reset_index()
+                         .rename(columns={'index': 'Händelsetyp', 'name': 'Count'}))
+        
+        top_incidents.index = top_incidents.index + 1
+        st.table(top_incidents)
+    
+    with col2:
+        st.subheader("Top 5 Mängd Händelser per Stad")
+    
+        city_counts = filtered_df['location_name'].value_counts().nlargest(5)
+
+        city_colors = ["#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9", "#92A8D1"]
+
+        city_bar = (
+            Bar(init_opts=opts.InitOpts())
+            .add_xaxis(city_counts.index.tolist())
+            .add_yaxis(
+                "Mängd händelser", 
+                city_counts.values.tolist(),
+                itemstyle_opts=opts.ItemStyleOpts(
+                    color=JsCode(f"function(params) {{ return ['{city_colors[0]}', '{city_colors[1]}', '{city_colors[2]}', '{city_colors[3]}', '{city_colors[4]}'][params.dataIndex]; }}")
+                )
+            )
+            .reversal_axis()
+            .set_global_opts(
+                xaxis_opts=opts.AxisOpts(name="Mängd"),
+                yaxis_opts=opts.AxisOpts(name="Stad"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+            )
+        )
+        st_pyecharts(city_bar)
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        st.subheader("Mängd Händelser per Kategori")
+        
+        incident_counts = filtered_df['main_categories'].value_counts()
+
+        category_colors = ["#FFD700", "#FF6347", "#4682B4", "#32CD32", "#9370DB"]
+
+        bar = (
+            Bar()
+            .add_xaxis(incident_counts.index.tolist())
+            .add_yaxis(
+                "Mängd händelser", 
+                incident_counts.values.tolist(),
+                itemstyle_opts=opts.ItemStyleOpts(
+                    color=JsCode(f"function(params) {{ return ['{category_colors[0]}', '{category_colors[1]}', '{category_colors[2]}', '{category_colors[3]}', '{category_colors[4]}'][params.dataIndex]; }}")
+                )
+            )
+            .set_global_opts(
+                xaxis_opts=opts.AxisOpts(name="Kategori", axislabel_opts={"rotate": 45}),
+                yaxis_opts=opts.AxisOpts(name="Mängd"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+            )
+        )
+        st_pyecharts(bar)
+    
+    with col4:
+        st.subheader("Händelser över tid")
+        
+        filtered_df['date'] = pd.to_datetime(filtered_df['date'])
+        crimes_over_time = filtered_df.groupby(filtered_df['date'].dt.to_period('D')).size().reset_index(name='count')
+        crimes_over_time['date'] = crimes_over_time['date'].dt.strftime('%Y-%m-%d')
+
+        line_color = "#FF4500"
+
+        line = (
+            Line()
+            .add_xaxis(crimes_over_time['date'].tolist())
+            .add_yaxis(
+                "Mängd Händelser", 
+                crimes_over_time['count'].tolist(),
+                itemstyle_opts=opts.ItemStyleOpts(color=line_color)
+            )
+            .set_global_opts(
+                xaxis_opts=opts.AxisOpts(name="Datum", axislabel_opts={"rotate": 45}),
+                yaxis_opts=opts.AxisOpts(name="Mängd"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+            )
+        )
+        st_pyecharts(line)
