@@ -10,7 +10,7 @@ from streamlit_echarts import st_pyecharts
 from pyecharts.commons.utils import JsCode
 
 credentials = service_account.Credentials.from_service_account_file(
-    r"C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\crime-in-sweden-project-47eef163c346.json"
+    r"crime-in-sweden-project-47eef163c346.json"
 )
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
