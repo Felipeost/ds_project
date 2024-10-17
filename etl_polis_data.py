@@ -100,7 +100,7 @@ def etl_pipeline():
         df = transform_data(data)
         
         if df is not None:
-            credentials_file = r"C:\Users\lalka\OneDrive\Skrivbord\Studier\Projekt\working repo\ds_project\crime-in-sweden-project-47eef163c346.json"
+            credentials_file = r"crime-in-sweden-project-47eef163c346.json"
             project_id = "crime-in-sweden-project"
             dataset_id = "Crime_in_Sweden"
             table_id = f"{project_id}.{dataset_id}.events"
