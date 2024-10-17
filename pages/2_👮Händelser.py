@@ -11,8 +11,10 @@ from streamlit_echarts import st_pyecharts
 from pyecharts.commons.utils import JsCode
 
 # Load credentials from the JSON key file
-script_dir = os.path.dirname(os.path.abspath(__file__))  
-credentials_path = os.path.join(script_dir, '..', 'crime-in-sweden-project-47eef163c346.json')  
+script_dir = os.path.dirname(os.path.abspath(__file__))
+credentials_path = os.path.join(
+    script_dir, "..", "crime-in-sweden-project-47eef163c346.json"
+)
 
 credentials = service_account.Credentials.from_service_account_file(credentials_path)
 
@@ -101,17 +103,19 @@ with tabs[0]:
 
     st.sidebar.header("Filtrera")
 
-    with st.sidebar.expander("Välj händelsekategori"):
-        selected_category = st.radio(
-            "Välj händelsekategori",
-            options=["Alla"] + sorted(df["main_categories"].unique()),
-            index=0,
-        )
+    # Select category
+    selected_category = st.sidebar.selectbox(
+        "Välj händelsekategori",
+        options=["Alla"] + sorted(df["main_categories"].unique()),
+        index=0,
+    )
 
-    with st.sidebar.expander("Välj län"):
-        selected_location = st.radio(
-            "Välj län", options=["Alla"] + sorted(df["location_name"].unique()), index=0
-        )
+    # Select location
+    selected_location = st.sidebar.selectbox(
+        "Välj plats",
+        options=["Alla"] + sorted(df["location_name"].unique()),
+        index=0,
+    )
 
     with st.sidebar.expander("Välj period"):
         start_date = st.date_input("Startdatum", value=pd.to_datetime(df["date"].min()))
@@ -199,7 +203,7 @@ with tabs[1]:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Top 3 Mest Rapporterade Händelser")
+        st.subheader("Top 5 Mest Rapporterade Händelser")
 
         top_incidents = (
             filtered_df["name"]
@@ -213,7 +217,7 @@ with tabs[1]:
         st.table(top_incidents)
 
     with col2:
-        st.subheader("Top 5 Mängd Händelser per Stad")
+        st.subheader("Top 5 Mängd Händelser per Plats")
 
         city_counts = filtered_df["location_name"].value_counts().nlargest(5)
 
@@ -236,8 +240,10 @@ with tabs[1]:
                 xaxis_opts=opts.AxisOpts(name="Mängd"),
                 yaxis_opts=opts.AxisOpts(name="Stad"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
+        # Render the chart with specified size
         st_pyecharts(city_bar)
 
     col3, col4 = st.columns(2)
@@ -267,6 +273,7 @@ with tabs[1]:
                 ),
                 yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
         st_pyecharts(bar)
@@ -296,6 +303,7 @@ with tabs[1]:
                 xaxis_opts=opts.AxisOpts(name="Datum", axislabel_opts={"rotate": 45}),
                 yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
         st_pyecharts(line)

@@ -9,8 +9,10 @@ from google.cloud import bigquery
 import matplotlib.pyplot as plt
 
 # Load credentials from the JSON key file
-script_dir = os.path.dirname(os.path.abspath(__file__))  
-credentials_path = os.path.join(script_dir, '..', 'crime-in-sweden-project-47eef163c346.json')  
+script_dir = os.path.dirname(os.path.abspath(__file__))
+credentials_path = os.path.join(
+    script_dir, "..", "crime-in-sweden-project-47eef163c346.json"
+)
 credentials = service_account.Credentials.from_service_account_file(credentials_path)
 
 
@@ -28,6 +30,7 @@ def count_trafikolycka(city_name):
     for row in results:
         return row["trafikolycka_count"]
     return 0
+
 
 def count_trafikolycka_all():
     query = f"""
@@ -76,6 +79,7 @@ def get_main_cities_from_bigquery():
 
     return main_cities
 
+
 main_cities = get_main_cities_from_bigquery()
 
 
@@ -93,8 +97,8 @@ def fetch_weather_data(latitude, longitude):
 
 def format_valid_time(valid_time):
     dt = datetime.strptime(valid_time, "%Y-%m-%dT%H:%M:%SZ")
-    formatted_date = dt.strftime("%d-%m-%Y") 
-    formatted_time = dt.strftime("%H:%M") 
+    formatted_date = dt.strftime("%d-%m-%Y")
+    formatted_time = dt.strftime("%H:%M")
     return formatted_date, formatted_time
 
 
@@ -110,25 +114,10 @@ def categorize_weather(temp, wind_gust, precipitation, visibility):
 # Streamlit App Title
 st.title("Körsäkerhet i Realtid ⚠️ och Väderinsikter 🌤️")
 
-st.write(
-    """
-Den här sidan ger insikter om körsäkerhet och väder i realtid
-genom att utvinna data från Sveriges Meteorologiska och Hydrologiska instituts (SMHI) API. Användare kan välja
-en stad från en omfattande lista för att se den senaste väderinformationen.
-Utifrån det kategoriserar appen körning
-förhållanden som antingen bra, måttlig eller dålig, vilket hjälper användare att fatta välgrundade beslut om resesäkerhet.
-Dessutom visar applikationen antalet trafikolyckor som rapporterats sedan dess
-datainsamlingen började den 14 september, vilket gör att användarna kan mäta trafiksäkerheten effektivt.
-Mot slutet av sidan finns en sektion "Live Trafikuppdateringar" där
-användare kan ge uppdateringar om sina upplevelser på vägen.
-    """
-)
-
-
-st.sidebar.header("🏙️Stadsval")
+st.sidebar.header("🏙️ Platsval")
 
 select_all = st.sidebar.checkbox(
-    "Markera för Alla städer eller Avmarkera för en specifik stad", value=True
+    "Markera för Alla platser eller Avmarkera för en specifik plats", value=True
 )
 
 if select_all:
@@ -136,12 +125,12 @@ if select_all:
 
 else:
     selected_city = st.sidebar.selectbox(
-        "Välj en stad", list(sorted(main_cities.keys()))
+        "Välj en plats", list(sorted(main_cities.keys()))
     )
     selected_cities = [selected_city]
 
 if select_all:
-    trafikolycka_count_all = count_trafikolycka_all() 
+    trafikolycka_count_all = count_trafikolycka_all()
 
     st.subheader(
         f"Totalt antal trafikolyckor som rapporterats hittills i alla städer: {trafikolycka_count_all}"
@@ -152,11 +141,11 @@ if select_all:
 
     cities, counts = get_top_5_trafikolycka()
 
-    st.sidebar.header("💥Topp 5 Städer med Flest Olyckor")
+    st.sidebar.header("💥Topp 5 Platser med Flest Olyckor")
     fig, ax = plt.subplots()
     ax.bar(cities, counts, color="skyblue")
     ax.set_xlabel("Antal Olyckor")
-    ax.set_ylabel("Stad")
+    ax.set_ylabel("Plats")
 
     st.sidebar.pyplot(fig)
 
@@ -166,6 +155,7 @@ sweden_map = folium.Map(location=[62, 15], zoom_start=5)
 color_mapping = {"Bra": "green", "Måttlig": "yellow", "Dålig": "red"}
 
 bad_condition_cities = []
+moderate_condition_cities = []
 
 for city in selected_cities:
     lat, lon = main_cities[city]
@@ -174,9 +164,7 @@ for city in selected_cities:
     if weather_data:
         most_recent_entry = weather_data["timeSeries"][0]
         valid_time = most_recent_entry["validTime"]
-        formatted_date, formatted_time = format_valid_time(
-            valid_time
-        )  
+        formatted_date, formatted_time = format_valid_time(valid_time)
 
         temp = next(
             (
@@ -255,12 +243,12 @@ for city in selected_cities:
             visibility,
         )
 
-        color = color_mapping.get(
-            condition, "gray"
-        ) 
+        color = color_mapping.get(condition, "gray")
 
         if condition == "Dålig":
             bad_condition_cities.append(city)
+        if condition == "Måttlig":
+            moderate_condition_cities.append(city)
 
         # Define the popup content conditionally
         popup_content = None
@@ -281,7 +269,7 @@ for city in selected_cities:
             color=color,
             fill=True,
             fill_opacity=0.6,
-            popup=popup_content, 
+            popup=popup_content,
         ).add_to(sweden_map)
 
     if not select_all:
@@ -307,8 +295,8 @@ for city in selected_cities:
         if not select_all:
             trafikolycka_count = count_trafikolycka(selected_city)
 
-        st.subheader(f"🏙️Stad: {city} ")
-        st.subheader(f"💥Antal olyckor rapporterade hittills: {trafikolycka_count} ")
+        st.subheader(f"🏙️ Plats: {city} ")
+        st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
 
         # First row: 3 columns
         col1, col2, col3 = st.columns(3)
@@ -425,13 +413,20 @@ for city in selected_cities:
 if select_all:
 
     # After the loop, display the list of cities with 'Bad' condition in the sidebar
-    st.sidebar.header("👎Städer med dåliga körförhållanden")
+    st.sidebar.header("👎 Platser med dåliga körförhållanden")
     if bad_condition_cities:
         for bad_city in bad_condition_cities:
             st.sidebar.write(f"🚗 {bad_city}")
     else:
         st.sidebar.write("Inga städer har för närvarande dåliga körförhållanden.")
 
+    # After the loop, display the list of cities with 'Bad' condition in the sidebar
+    st.sidebar.header("⚖️ Platser med måttlig körförhållanden")
+    if moderate_condition_cities:
+        for moderate_city in moderate_condition_cities:
+            st.sidebar.write(f"🚗 {moderate_city}")
+    else:
+        st.sidebar.write("Inga städer har för närvarande måttlig körförhållanden.")
 
 # Add a legend to the map
 legend_html = """
