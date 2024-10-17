@@ -1,3 +1,4 @@
+import os
 import folium
 import requests
 import streamlit as st
@@ -8,15 +9,14 @@ from google.cloud import bigquery
 import matplotlib.pyplot as plt
 
 # Load credentials from the JSON key file
-credentials = service_account.Credentials.from_service_account_file(
-    r"C:\Users\seema\OneDrive\Skrivbord\police api\crime-in-sweden-project-fd7f2891a629.json"
-)
+script_dir = os.path.dirname(os.path.abspath(__file__))  
+credentials_path = os.path.join(script_dir, '..', 'crime-in-sweden-project-47eef163c346.json')  
+credentials = service_account.Credentials.from_service_account_file(credentials_path)
 
-# Initialize BigQuery client
+
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
-# Define a function to count 'Trafikolycka' incidents for a given city
 def count_trafikolycka(city_name):
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count
@@ -28,10 +28,6 @@ def count_trafikolycka(city_name):
     for row in results:
         return row["trafikolycka_count"]
     return 0
-
-
-# Define a function to count 'Trafikolycka' incidents for all cities
-
 
 def count_trafikolycka_all():
     query = f"""
@@ -46,7 +42,6 @@ def count_trafikolycka_all():
     return 0
 
 
-# Function to get top 5 cities with the most accidents
 def get_top_5_trafikolycka():
     query = """
     SELECT location_name, COUNT(*) AS trafikolycka_count
@@ -66,7 +61,6 @@ def get_top_5_trafikolycka():
     return cities, counts
 
 
-# Query BigQuery for distinct locations with latitude and longitude
 def get_main_cities_from_bigquery():
     query = """
     SELECT DISTINCT location_name, latitude, longitude
@@ -76,15 +70,12 @@ def get_main_cities_from_bigquery():
     query_job = client.query(query)
     results = query_job.result()
 
-    # Build the main_cities dictionary
     main_cities = {}
     for row in results:
         main_cities[row["location_name"]] = (row["latitude"], row["longitude"])
 
     return main_cities
 
-
-# Use the function to get the main cities
 main_cities = get_main_cities_from_bigquery()
 
 
@@ -101,10 +92,9 @@ def fetch_weather_data(latitude, longitude):
 
 
 def format_valid_time(valid_time):
-    # Parse the valid_time string
     dt = datetime.strptime(valid_time, "%Y-%m-%dT%H:%M:%SZ")
-    formatted_date = dt.strftime("%d-%m-%Y")  # Format as 'DD-MM-YYYY'
-    formatted_time = dt.strftime("%H:%M")  # Format as 'H:MM'
+    formatted_date = dt.strftime("%d-%m-%Y") 
+    formatted_time = dt.strftime("%H:%M") 
     return formatted_date, formatted_time
 
 
@@ -134,31 +124,25 @@ användare kan ge uppdateringar om sina upplevelser på vägen.
     """
 )
 
-# Sidebar for city selection
 
 st.sidebar.header("🏙️Stadsval")
 
-# Checkbox to select all cities
 select_all = st.sidebar.checkbox(
     "Markera för Alla städer eller Avmarkera för en specifik stad", value=True
 )
 
 if select_all:
-    # When "Select All Cities" is checked
     selected_cities = list(sorted(main_cities.keys()))
 
 else:
-    # When "Select All Cities" is unchecked, allow selecting one city
     selected_city = st.sidebar.selectbox(
         "Välj en stad", list(sorted(main_cities.keys()))
     )
     selected_cities = [selected_city]
 
-# If the "Select All Cities" option is selected, display the traffic incident count for all cities
 if select_all:
-    trafikolycka_count_all = count_trafikolycka_all()  # Get the count for all cities
+    trafikolycka_count_all = count_trafikolycka_all() 
 
-    # Display the number of traffic incidents reported for all cities
     st.subheader(
         f"Totalt antal trafikolyckor som rapporterats hittills i alla städer: {trafikolycka_count_all}"
     )
@@ -166,40 +150,34 @@ if select_all:
         "För körsäkerhetstips följ denna länk: https://trafiko.se/faktabank/halt-vaglag"
     )
 
-    # Get data for the bar chart
     cities, counts = get_top_5_trafikolycka()
-    # Plot bar chart in the sidebar
+
     st.sidebar.header("💥Topp 5 Städer med Flest Olyckor")
     fig, ax = plt.subplots()
     ax.bar(cities, counts, color="skyblue")
     ax.set_xlabel("Antal Olyckor")
     ax.set_ylabel("Stad")
 
-    # Display the plot in the sidebar
     st.sidebar.pyplot(fig)
 
 # Initialize Folium Map
 sweden_map = folium.Map(location=[62, 15], zoom_start=5)
 
-# Color mapping based on weather condition
 color_mapping = {"Bra": "green", "Måttlig": "yellow", "Dålig": "red"}
 
-# Create a list to store cities with 'Bad' condition
 bad_condition_cities = []
 
-# Iterate over selected cities and add markers
 for city in selected_cities:
     lat, lon = main_cities[city]
     weather_data = fetch_weather_data(lat, lon)
 
     if weather_data:
-        most_recent_entry = weather_data["timeSeries"][0]  # Get the latest entry
+        most_recent_entry = weather_data["timeSeries"][0]
         valid_time = most_recent_entry["validTime"]
         formatted_date, formatted_time = format_valid_time(
             valid_time
-        )  # Format the valid time
+        )  
 
-        # Extract relevant weather parameters with default values
         temp = next(
             (
                 param["values"][0]
@@ -277,12 +255,10 @@ for city in selected_cities:
             visibility,
         )
 
-        # Determine marker color
         color = color_mapping.get(
             condition, "gray"
-        )  # Default to gray if condition is unknown
+        ) 
 
-        # Add cities with 'Bad' condition to the list
         if condition == "Dålig":
             bad_condition_cities.append(city)
 
@@ -299,18 +275,16 @@ for city in selected_cities:
                 parse_html=True,
             )
 
-        # Add marker to the map
         folium.CircleMarker(
             location=(lat, lon),
             radius=10,
             color=color,
             fill=True,
             fill_opacity=0.6,
-            popup=popup_content,  # Use the popup_content variable here
+            popup=popup_content, 
         ).add_to(sweden_map)
 
     if not select_all:
-        # Display weather info only when a single city is selected
 
         st.markdown(
             f"""

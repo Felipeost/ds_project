@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from google.oauth2 import service_account
 from google.cloud import bigquery
@@ -10,9 +11,10 @@ from streamlit_echarts import st_pyecharts
 from pyecharts.commons.utils import JsCode
 
 # Load credentials from the JSON key file
-credentials = service_account.Credentials.from_service_account_file(
-    r"C:\Users\seema\OneDrive\Skrivbord\police api\crime-in-sweden-project-fd7f2891a629.json"
-)
+script_dir = os.path.dirname(os.path.abspath(__file__))  
+credentials_path = os.path.join(script_dir, '..', 'crime-in-sweden-project-47eef163c346.json')  
+
+credentials = service_account.Credentials.from_service_account_file(credentials_path)
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
