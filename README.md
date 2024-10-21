@@ -4,7 +4,7 @@
 This project analyzes and visualizes events in Sweden reported by the Police and shows weather and driving conditions on Swedish roads. It fetches data from the Police API and SMHI API, processes it, and presents it using Streamlit for web-based interaction. The project includes features for filtering events by category and location and provides visualizations on maps.
 
 ## Table of Contents
-- [Scturcture](#structure)
+- [Structure](#structure)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
