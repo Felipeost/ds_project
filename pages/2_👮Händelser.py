@@ -10,13 +10,8 @@ from pyecharts import options as opts
 from streamlit_echarts import st_pyecharts
 from pyecharts.commons.utils import JsCode
 
-# Load credentials from the JSON key file
-script_dir = os.path.dirname(os.path.abspath(__file__))
-credentials_path = os.path.join(
-    script_dir, "..", "crime-in-sweden-project-47eef163c346.json"
-)
-
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
+credentials= service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"])
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 

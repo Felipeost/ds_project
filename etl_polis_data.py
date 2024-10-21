@@ -75,7 +75,6 @@ def transform_data(data):
 
 def load_data_to_bigquery(df, credentials, project_id, dataset_id, table_id):
     try:
-        # Use the credentials object directly
         client = bigquery.Client(credentials=credentials, project=project_id)
 
         try:

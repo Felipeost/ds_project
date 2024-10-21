@@ -8,12 +8,10 @@ from google.oauth2 import service_account
 from google.cloud import bigquery
 import matplotlib.pyplot as plt
 
-# Load credentials from the JSON key file
-script_dir = os.path.dirname(os.path.abspath(__file__))
-credentials_path = os.path.join(
-    script_dir, "..", "crime-in-sweden-project-47eef163c346.json"
-)
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
+credentials= service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"])
+
+client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
