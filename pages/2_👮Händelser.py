@@ -103,14 +103,12 @@ with tabs[0]:
 
     st.sidebar.header("Filtrera")
 
-    # Select category
     selected_category = st.sidebar.selectbox(
         "Välj händelsekategori",
         options=["Alla"] + sorted(df["main_categories"].unique()),
         index=0,
     )
-
-    # Select location
+    
     selected_location = st.sidebar.selectbox(
         "Välj plats",
         options=["Alla"] + sorted(df["location_name"].unique()),
