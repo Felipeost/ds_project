@@ -136,7 +136,7 @@ with tabs[0]:
         "Rån och Stöld": ("lock", "orange"),
         "Våld": ("skull-crossbones", "black"),
         "Skottlossning": ("crosshairs", "gray"),
-        "Explosion": ("bomb", "yellow"),
+        "Explosion": ("bomb", "orange"),
         "Ovrigt": None,
     }
 
