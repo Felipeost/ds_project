@@ -16,20 +16,22 @@ This project analyzes and visualizes events in Sweden reported by the Police and
 
 Event and Weather in Sweden Project
 │
-├── .stremlit/
-│   ├── config.toml               # Configuration for Streamlit (Styles)
-│   └── secrets.toml (hidden)     # Sensitive information (BigQuery credentials)
-├── pages/                        # Directory for Stremlit pages
-│   ├── 2_Händelser.py            # Streamlit-page for events
-│   └── 3_Väder.py                # Streamlit-page for weather
-├── .gitignore                    # Specifies files and directories to ignore in version control
-├── 1_intro.py                    # Main page for Streamlit-application
-├── comments.csv                  # CSV-file for collecting user-comments
-├── etl_pipeline.log              # Log-file for a pipeline
-├── etl_polis_data.py             # ETL pipeline for fetching Police API data and loading into BigQuery
-├── my.bat (hidden)               # .bat file for automating pipeline excecution with Windows Task Scheduler
-├── requirments.txt               # txt-file with required packages
-└── README.md                     # Project overview, instructions, and documentation
+├── .streamlit/
+│   ├── config.toml              # Configuration for Streamlit (Styles)
+│   └── secrets.toml (hidden)    # Sensitive information (BigQuery credentials)
+│
+├── pages/                       # Directory for Streamlit pages
+│   ├── 2_Händelser.py           # Streamlit page for events
+│   └── 3_Väder.py               # Streamlit page for weather
+│
+├── .gitignore                   # Specifies files and directories to ignore in version control
+├── 1_intro.py                   # Main page for Streamlit application
+├── comments.csv                 # CSV file for collecting user comments
+├── etl_pipeline.log             # Log file for the ETL pipeline
+├── etl_polis_data.py            # ETL pipeline for fetching Police API data and loading into BigQuery
+├── my.bat (hidden)              # .bat file for automating pipeline execution with Windows Task Scheduler
+├── requirements.txt             # Text file with required packages
+└── README.md                    # Project overview, instructions, and documentation
 
 
 ## Features
