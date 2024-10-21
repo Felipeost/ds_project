@@ -37,42 +37,45 @@ def categorize_event(event_type):
             return category
     return "Annat"
 
+# Load and preprocess data
 df = load_data()
 df["main_categories"] = df["name"].apply(categorize_event)
+
+# Sidebar for filtering
+st.sidebar.header("Filtrera")
+selected_category = st.sidebar.selectbox("Välj händelsekategori", ["Alla"] + sorted(df["main_categories"].unique()))
+selected_location = st.sidebar.selectbox("Välj plats", ["Alla"] + sorted(df["location_name"].unique()))
+
+with st.sidebar.expander("Välj period"):
+    start_date = st.date_input("Startdatum", value=pd.to_datetime(df["date"].min()))
+    end_date = st.date_input("Slutdatum", value=pd.to_datetime(df["date"].max()))
+
+# Filter data based on user selections
+filtered_df = df[
+    ((df["main_categories"] == selected_category) | (selected_category == "Alla")) &
+    ((df["location_name"] == selected_location) | (selected_location == "Alla")) &
+    (df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))
+]
 
 with tabs[0]:
     st.header("Händelser i Sverige rapporterade av Polisen 👮‍♂️")
     st.write("Få mer insikt genom att klicka på markören!")
-    
-    st.sidebar.header("Filtrera")
-    selected_category = st.sidebar.selectbox("Välj händelsekategori", ["Alla"] + sorted(df["main_categories"].unique()))
-    selected_location = st.sidebar.selectbox("Välj plats", ["Alla"] + sorted(df["location_name"].unique()))
-    
-    with st.sidebar.expander("Välj period"):
-        start_date = st.date_input("Startdatum", value=pd.to_datetime(df["date"].min()))
-        end_date = st.date_input("Slutdatum", value=pd.to_datetime(df["date"].max()))
-    
-    filtered_df = df[
-        ((df["main_categories"] == selected_category) | (selected_category == "Alla")) &
-        ((df["location_name"] == selected_location) | (selected_location == "Alla")) &
-        (df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))
-    ]
-    
+
     filtered_map = folium.Map(location=[61.0, 15.0], zoom_start=5)
     icon_mapping = {
         "Trafik": ("car", "blue"), "Brand": ("fire", "red"),
         "Rån och Stöld": ("lock", "orange"), "Våld": ("skull-crossbones", "black"),
         "Skottlossning": ("crosshairs", "gray"), "Explosion": ("bomb", "orange")
     }
-    
+
     event_counts = filtered_df.groupby(["latitude", "longitude"]).size().reset_index(name="count")
-    
+
     for _, row in event_counts.iterrows():
         lat, lon, count = row["latitude"], row["longitude"], int(row["count"])
         event_category = filtered_df[(filtered_df["latitude"] == lat) & (filtered_df["longitude"] == lon)]["main_categories"].values[0]
         icon_name, icon_color = icon_mapping.get(event_category, ("info-circle", "green"))
         folium.Marker(location=[lat, lon], icon=folium.Icon(icon=icon_name, prefix="fa", color=icon_color), tooltip=f"Antal: {count}").add_to(filtered_map)
-    
+
     clicked_data = st_folium(filtered_map, width=1000, height=700)
     if clicked_data and clicked_data["last_object_clicked"]:
         lat, lon = clicked_data["last_object_clicked"]["lat"], clicked_data["last_object_clicked"]["lng"]
@@ -88,26 +91,28 @@ with tabs[0]:
             """, unsafe_allow_html=True)
 
 with tabs[1]:
-    st.header("Analys av Polisens Rapporterade Händelser i Sverige")
+    st.header("Analys av Polisens Rapporterade Händelser i Sverige 📊")
 
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        st.subheader("Top 3 Mest Rapporterade Händelser")
-        
-        top_incidents = (filtered_df['name']
-                         .value_counts()
-                         .nlargest(5)
-                         .reset_index()
-                         .rename(columns={'index': 'Händelsetyp', 'name': 'Count'}))
-        
+        st.subheader("🔸 Top 5 Mest Rapporterade Händelser")
+
+        top_incidents = (
+            filtered_df["name"]
+            .value_counts()
+            .nlargest(5)
+            .reset_index()
+            .rename(columns={"index": "Händelsetyp", "name": "Antal"})
+        )
+
         top_incidents.index = top_incidents.index + 1
         st.table(top_incidents)
-    
+
     with col2:
-        st.subheader("Top 5 Mängd Händelser per Stad")
-    
-        city_counts = filtered_df['location_name'].value_counts().nlargest(5)
+        st.subheader("🔸 Top 5 Mängd Händelser per Plats")
+
+        city_counts = filtered_df["location_name"].value_counts().nlargest(5)
 
         city_colors = ["#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9", "#92A8D1"]
 
@@ -115,27 +120,32 @@ with tabs[1]:
             Bar(init_opts=opts.InitOpts())
             .add_xaxis(city_counts.index.tolist())
             .add_yaxis(
-                "Mängd händelser", 
+                "Mängd händelser",
                 city_counts.values.tolist(),
                 itemstyle_opts=opts.ItemStyleOpts(
-                    color=JsCode(f"function(params) {{ return ['{city_colors[0]}', '{city_colors[1]}', '{city_colors[2]}', '{city_colors[3]}', '{city_colors[4]}'][params.dataIndex]; }}")
-                )
+                    color=JsCode(
+                        f"function(params) {{ return ['{city_colors[0]}', '{city_colors[1]}', '{city_colors[2]}', '{city_colors[3]}', '{city_colors[4]}'][params.dataIndex]; }}"
+                    )
+                ),
             )
-            .reversal_axis()
             .set_global_opts(
-                xaxis_opts=opts.AxisOpts(name="Mängd"),
-                yaxis_opts=opts.AxisOpts(name="Stad"),
+                xaxis_opts=opts.AxisOpts(
+                    name="Stad",
+                    axislabel_opts=opts.LabelOpts(rotate=-90, interval=0),
+                ),
+                yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
         st_pyecharts(city_bar)
-    
+
     col3, col4 = st.columns(2)
-    
+
     with col3:
-        st.subheader("Mängd Händelser per Kategori")
-        
-        incident_counts = filtered_df['main_categories'].value_counts()
+        st.subheader("🔸 Mängd Händelser per Kategori")
+
+        incident_counts = filtered_df["main_categories"].value_counts()
 
         category_colors = ["#FFD700", "#FF6347", "#4682B4", "#32CD32", "#9370DB"]
 
@@ -143,41 +153,51 @@ with tabs[1]:
             Bar()
             .add_xaxis(incident_counts.index.tolist())
             .add_yaxis(
-                "Mängd händelser", 
+                "Mängd händelser",
                 incident_counts.values.tolist(),
                 itemstyle_opts=opts.ItemStyleOpts(
-                    color=JsCode(f"function(params) {{ return ['{category_colors[0]}', '{category_colors[1]}', '{category_colors[2]}', '{category_colors[3]}', '{category_colors[4]}'][params.dataIndex]; }}")
-                )
+                    color=JsCode(
+                        f"function(params) {{ return ['{category_colors[0]}', '{category_colors[1]}', '{category_colors[2]}', '{category_colors[3]}', '{category_colors[4]}'][params.dataIndex]; }}"
+                    )
+                ),
             )
             .set_global_opts(
-                xaxis_opts=opts.AxisOpts(name="Kategori", axislabel_opts={"rotate": 45}),
+                xaxis_opts=opts.AxisOpts(
+                    name="Kategori", axislabel_opts={"rotate": 45}
+                ),
                 yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
         st_pyecharts(bar)
-    
+
     with col4:
-        st.subheader("Händelser över tid")
-        
-        filtered_df['date'] = pd.to_datetime(filtered_df['date'])
-        crimes_over_time = filtered_df.groupby(filtered_df['date'].dt.to_period('D')).size().reset_index(name='count')
-        crimes_over_time['date'] = crimes_over_time['date'].dt.strftime('%Y-%m-%d')
+        st.subheader("🔸 Händelser över tid")
+
+        filtered_df["date"] = pd.to_datetime(filtered_df["date"])
+        crimes_over_time = (
+            filtered_df.groupby(filtered_df["date"].dt.to_period("D"))
+            .size()
+            .reset_index(name="count")
+        )
+        crimes_over_time["date"] = crimes_over_time["date"].dt.strftime("%Y-%m-%d")
 
         line_color = "#FF4500"
 
         line = (
             Line()
-            .add_xaxis(crimes_over_time['date'].tolist())
+            .add_xaxis(crimes_over_time["date"].tolist())
             .add_yaxis(
-                "Mängd Händelser", 
-                crimes_over_time['count'].tolist(),
-                itemstyle_opts=opts.ItemStyleOpts(color=line_color)
+                "Mängd Händelser",
+                crimes_over_time["count"].tolist(),
+                itemstyle_opts=opts.ItemStyleOpts(color=line_color),
             )
             .set_global_opts(
                 xaxis_opts=opts.AxisOpts(name="Datum", axislabel_opts={"rotate": 45}),
                 yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
         st_pyecharts(line)
