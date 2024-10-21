@@ -50,3 +50,30 @@
 2024-10-15 11:50:40,538 - INFO - ETL Pipeline started.
 2024-10-15 11:50:40,889 - INFO - Data successfully fetched from API.
 2024-10-15 11:50:41,069 - INFO - Data transformation completed successfully.
+2024-10-21 13:23:36,159 - INFO - ETL Pipeline started.
+2024-10-21 13:23:36,492 - INFO - Data successfully fetched from API.
+2024-10-21 13:23:36,669 - INFO - Data transformation completed successfully.
+2024-10-21 13:23:36,684 - CRITICAL - ETL Pipeline failed: 'st.secrets has no key "gcp_service_account". Did you forget to add it to secrets.toml, mount it to secret directory, or the app settings on Streamlit Cloud? More info: https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management'
+2024-10-21 13:25:29,175 - INFO - ETL Pipeline started.
+2024-10-21 13:25:29,255 - INFO - Data successfully fetched from API.
+2024-10-21 13:25:29,334 - INFO - Data transformation completed successfully.
+2024-10-21 13:25:29,585 - CRITICAL - ETL Pipeline failed: Found invalid character in key name: ':'. Try quoting the key name. (line 2 column 7 char 28)
+2024-10-21 13:26:26,905 - INFO - ETL Pipeline started.
+2024-10-21 13:26:27,230 - INFO - Data successfully fetched from API.
+2024-10-21 13:26:27,302 - INFO - Data transformation completed successfully.
+2024-10-21 13:26:27,540 - CRITICAL - ETL Pipeline failed: Found tokens after a closed string. Invalid TOML. (line 2 column 1 char 22)
+2024-10-21 13:28:11,410 - INFO - ETL Pipeline started.
+2024-10-21 13:28:11,802 - INFO - Data successfully fetched from API.
+2024-10-21 13:28:11,876 - INFO - Data transformation completed successfully.
+2024-10-21 13:28:11,885 - ERROR - An error occurred during data loading: expected str, bytes or os.PathLike object, not Credentials
+2024-10-21 13:28:11,886 - INFO - ETL Pipeline finished. Total duration: 0:00:00.476046
+2024-10-21 13:28:39,001 - INFO - ETL Pipeline started.
+2024-10-21 13:28:39,084 - INFO - Data successfully fetched from API.
+2024-10-21 13:28:39,158 - INFO - Data transformation completed successfully.
+2024-10-21 13:28:39,168 - ERROR - An error occurred during data loading: expected str, bytes or os.PathLike object, not Credentials
+2024-10-21 13:28:39,169 - INFO - ETL Pipeline finished. Total duration: 0:00:00.167505
+2024-10-21 13:30:22,030 - INFO - ETL Pipeline started.
+2024-10-21 13:30:22,115 - INFO - Data successfully fetched from API.
+2024-10-21 13:30:22,196 - INFO - Data transformation completed successfully.
+2024-10-21 13:30:25,967 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-21 13:30:25,967 - INFO - ETL Pipeline finished. Total duration: 0:00:03.936872

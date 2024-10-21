@@ -6,6 +6,7 @@ import logging
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from datetime import datetime
+import streamlit as st
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 log_file = os.path.join(script_dir, "etl_pipeline.log")
@@ -72,10 +73,10 @@ def transform_data(data):
         logging.error(f"An error occurred during data transformation: {err}")
         return None
 
-def load_data_to_bigquery(df, credentials_file, project_id, dataset_id, table_id):
+def load_data_to_bigquery(df, credentials, project_id, dataset_id, table_id):
     try:
-        credentials = service_account.Credentials.from_service_account_file(credentials_file)
-        client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+        # Use the credentials object directly
+        client = bigquery.Client(credentials=credentials, project=project_id)
 
         try:
             client.get_dataset(dataset_id)
@@ -92,6 +93,7 @@ def load_data_to_bigquery(df, credentials_file, project_id, dataset_id, table_id
     except Exception as err:
         logging.error(f"An error occurred during data loading: {err}")
 
+
 def etl_pipeline():
     url = "https://polisen.se/api/events"
     data = extract_data(url)
@@ -100,12 +102,13 @@ def etl_pipeline():
         df = transform_data(data)
         
         if df is not None:
-            credentials_file = r"crime-in-sweden-project-47eef163c346.json"
+            credentials= service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"])
             project_id = "crime-in-sweden-project"
             dataset_id = "Crime_in_Sweden"
             table_id = f"{project_id}.{dataset_id}.events"
             
-            load_data_to_bigquery(df, credentials_file, project_id, dataset_id, table_id)
+            load_data_to_bigquery(df, credentials, project_id, dataset_id, table_id)
 
 if __name__ == "__main__":
     try:
