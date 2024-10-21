@@ -4,12 +4,33 @@
 This project analyzes and visualizes events in Sweden reported by the Police and shows weather and driving conditions on Swedish roads. It fetches data from the Police API and SMHI API, processes it, and presents it using Streamlit for web-based interaction. The project includes features for filtering events by category and location and provides visualizations on maps.
 
 ## Table of Contents
+- [Scturcture](#structure)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Structure
+
+Event and Weather in Sweden Project
+│
+├── .stremlit/
+│   ├── config.toml               # Configuration for Streamlit (Styles)
+│   └── secrets.toml (hidden)     # Sensitive information (BigQuery credentials)
+├── pages/                        # Directory for Stremlit pages
+│   ├── 2_Händelser.py            # Streamlit-page for events
+│   └── 3_Väder.py                # Streamlit-page for weather
+├── .gitignore                    # Specifies files and directories to ignore in version control
+├── 1_intro.py                    # Main page for Streamlit-application
+├── comments.csv                  # CSV-file for collecting user-comments
+├── etl_pipeline.log              # Log-file for a pipeline
+├── etl_polis_data.py             # ETL pipeline for fetching Police API data and loading into BigQuery
+├── my.bat (hidden)               # .bat file for automating pipeline excecution with Windows Task Scheduler
+├── requirments.txt               # txt-file with required packages
+└── README.md                     # Project overview, instructions, and documentation
+
 
 ## Features
 - Fetches data from Police API and SMHI API
