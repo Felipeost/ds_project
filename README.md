@@ -13,7 +13,7 @@ This project analyzes and visualizes events in Sweden reported by the Police and
 - [License](#license)
 
 ## Structure
-
+```
 ds_project/
 │
 ├── .streamlit/
@@ -32,7 +32,7 @@ ds_project/
 ├── my.bat (hidden)               # .bat file for automating pipeline execution with Windows Task Scheduler
 ├── requirements.txt              # Text file with required packages
 └── README.md                     # Project overview, instructions, and documentation
-
+```
 
 ## Features
 - Fetches data from Police API and SMHI API
