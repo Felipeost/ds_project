@@ -144,8 +144,8 @@ if select_all:
     st.sidebar.header("💥Topp 5 Platser med Flest Olyckor")
     fig, ax = plt.subplots()
     ax.bar(cities, counts, color="skyblue")
-    ax.set_xlabel("Antal Olyckor")
-    ax.set_ylabel("Plats")
+    ax.set_xlabel("Plats")
+    ax.set_ylabel("Antal Olyckor")
 
     st.sidebar.pyplot(fig)
 

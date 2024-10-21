@@ -25,7 +25,12 @@ st.set_page_config(layout="wide")
 tabs = st.tabs(["Händelser", "Analys"])
 
 with tabs[0]:
-    st.header("Händelser i Sverige rapporterade av Polisen")
+    st.header("Händelser i Sverige rapporterade av Polisen 👮‍♂️")
+    st.write(
+        """
+             Få mer insikt genom att klicka på markören!
+             """
+    )
 
     query = """
     SELECT
@@ -198,26 +203,26 @@ with tabs[0]:
                 )
 
 with tabs[1]:
-    st.header("Analys av Polisens Rapporterade Händelser i Sverige")
+    st.header("Analys av Polisens Rapporterade Händelser i Sverige 📊")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Top 5 Mest Rapporterade Händelser")
+        st.subheader("🔸 Top 5 Mest Rapporterade Händelser")
 
         top_incidents = (
             filtered_df["name"]
             .value_counts()
             .nlargest(5)
             .reset_index()
-            .rename(columns={"index": "Händelsetyp", "name": "Count"})
+            .rename(columns={"name": "Händelsetyp", "count": "Antal"})
         )
 
         top_incidents.index = top_incidents.index + 1
         st.table(top_incidents)
 
     with col2:
-        st.subheader("Top 5 Mängd Händelser per Plats")
+        st.subheader("🔸 Top 5 Mängd Händelser per Plats")
 
         city_counts = filtered_df["location_name"].value_counts().nlargest(5)
 
@@ -235,10 +240,12 @@ with tabs[1]:
                     )
                 ),
             )
-            .reversal_axis()
             .set_global_opts(
-                xaxis_opts=opts.AxisOpts(name="Mängd"),
-                yaxis_opts=opts.AxisOpts(name="Stad"),
+                xaxis_opts=opts.AxisOpts(
+                    name="Stad",
+                    axislabel_opts=opts.LabelOpts(rotate=-90, interval=0),
+                ),
+                yaxis_opts=opts.AxisOpts(name="Mängd"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 legend_opts=opts.LegendOpts(is_show=False),
             )
@@ -249,7 +256,7 @@ with tabs[1]:
     col3, col4 = st.columns(2)
 
     with col3:
-        st.subheader("Mängd Händelser per Kategori")
+        st.subheader("🔸 Mängd Händelser per Kategori")
 
         incident_counts = filtered_df["main_categories"].value_counts()
 
@@ -279,7 +286,7 @@ with tabs[1]:
         st_pyecharts(bar)
 
     with col4:
-        st.subheader("Händelser över tid")
+        st.subheader("🔸 Händelser över tid")
 
         filtered_df["date"] = pd.to_datetime(filtered_df["date"])
         crimes_over_time = (

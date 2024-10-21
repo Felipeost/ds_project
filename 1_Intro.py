@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Data Science Project", page_icon="😊")
+st.set_page_config(page_title="Polis Rapport", page_icon="🚔")
 
 # Title of the app
 st.title("Välkommen till den Svenska Händelse- och Väderinsiktsappen!")
