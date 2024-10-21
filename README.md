@@ -14,7 +14,7 @@ This project analyzes and visualizes events in Sweden reported by the Police and
 
 ## Structure
 
-Event and Weather in Sweden Project
+ds_project/
 │
 ├── .streamlit/
 │   ├── config.toml               # Configuration for Streamlit (Styles)
