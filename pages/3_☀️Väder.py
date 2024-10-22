@@ -419,8 +419,7 @@ legend_html = """
 sweden_map.get_root().html.add_child(folium.Element(legend_html))
 
 # Display the map in Streamlit
-with st.container():
-    st_folium(sweden_map, width=800, height=500)
+st_folium(sweden_map, width=800, height=500)
 
 
 # Helper function to load comments from a CSV file
@@ -441,66 +440,65 @@ if "comments" not in st.session_state:
     st.session_state.comments = load_comments()
 
 # Title for Community Reports Section
-with st.container():
-    st.header("🔴 Live Trafikuppdateringar")
-    st.write(
-        "💬 Dela en uppdatering om aktuella trafik- eller körsäkerhetsförhållanden. Observera: Detta avsnitt är avsett för passagerare eller individer som inte längre kör bil."
-    )
+st.header("🔴 Live Trafikuppdateringar")
+st.write(
+    "💬 Dela en uppdatering om aktuella trafik- eller körsäkerhetsförhållanden. Observera: Detta avsnitt är avsett för passagerare eller individer som inte längre kör bil."
+)
 
-    # Input fields for name, location, and comment
-    name = st.text_input("Ditt Namn:")
-    location = st.selectbox("Din Plats:", list(sorted(main_cities.keys())))
-    comment = st.text_area("Uppdatering:")
+# Input fields for name, location, and comment
+name = st.text_input("Ditt Namn:")
+location = st.selectbox("Din Plats:", list(sorted(main_cities.keys())))
+comment = st.text_area("Uppdatering:")
 
-    # Input fields for date and time
-    date = st.date_input("Datum:", value=datetime.today())
-    time = st.time_input("Tid:", value=datetime.now().time())
+# Input fields for date and time
+date = st.date_input("Datum:", value=datetime.today())
+time = st.time_input("Tid:", value=datetime.now().time())
 
-    # Submit button
-    if st.button("Skicka in rapport"):
-        if name and location and comment:
-            # Combine date and time into a single datetime column
-            datetime_str = datetime.combine(date, time).strftime("%Y-%m-%d %H:%M")
-            # Append new comment to the DataFrame
-            new_comment = pd.DataFrame(
-                {
-                    "Namn": [name],
-                    "Plats": [location],
-                    "Datum & Tid": [datetime_str],
-                    "Uppdatering": [comment],
-                }
-            )
-            st.session_state.comments = pd.concat(
-                [st.session_state.comments, new_comment], ignore_index=True
-            )
-
-            # Save comments to the CSV file
-            save_comments(st.session_state.comments)
-
-            st.success("Din rapport har skickats!")
-        else:
-            st.error("Vänligen fyll i alla fält.")
-
-    # Display all submitted comments
-    if not st.session_state.comments.empty:
-        st.subheader("📑Inlämnade Rapporter")
-
-        # Add a selectbox for filtering comments by location (with all cities)
-        filter_location = st.selectbox(
-            "Filtrera efter plats:", ["Alla"] + list(sorted(main_cities.keys()))
+# Submit button
+if st.button("Skicka in rapport"):
+    if name and location and comment:
+        # Combine date and time into a single datetime column
+        datetime_str = datetime.combine(date, time).strftime("%Y-%m-%d %H:%M")
+        # Append new comment to the DataFrame
+        new_comment = pd.DataFrame(
+            {
+                "Namn": [name],
+                "Plats": [location],
+                "Datum & Tid": [datetime_str],
+                "Uppdatering": [comment],
+            }
+        )
+        st.session_state.comments = pd.concat(
+            [st.session_state.comments, new_comment], ignore_index=True
         )
 
-        # Filter comments based on selected location
-        if filter_location != "Alla":
-            filtered_comments = st.session_state.comments[
-                st.session_state.comments["Plats"] == filter_location
-            ]
-        else:
-            filtered_comments = st.session_state.comments
+        # Save comments to the CSV file
+        save_comments(st.session_state.comments)
 
-        # Check if there are comments for the selected location
-        if filtered_comments.empty:
-            st.info(f"Inga uppdateringar för {filter_location}.")
-        else:
-            # Display filtered comments without the index
-            st.write(filtered_comments.to_html(index=False), unsafe_allow_html=True)
+        st.success("Din rapport har skickats!")
+    else:
+        st.error("Vänligen fyll i alla fält.")
+
+# Display all submitted comments
+if not st.session_state.comments.empty:
+    st.subheader("📑Inlämnade Rapporter")
+
+    # Add a selectbox for filtering comments by location (with all cities)
+    filter_location = st.selectbox(
+        "Filtrera efter plats:", ["Alla"] + list(sorted(main_cities.keys()))
+    )
+
+    # Filter comments based on selected location
+    if filter_location != "Alla":
+        filtered_comments = st.session_state.comments[
+            st.session_state.comments["Plats"] == filter_location
+        ]
+    else:
+        filtered_comments = st.session_state.comments
+
+    # Check if there are comments for the selected location
+    if filtered_comments.empty:
+        st.info(f"Inga uppdateringar för {filter_location}.")
+    else:
+        # Display filtered comments without the index
+        st.write(filtered_comments.to_html(index=False), unsafe_allow_html=True)
