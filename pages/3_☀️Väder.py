@@ -7,6 +7,10 @@ from datetime import datetime
 from google.oauth2 import service_account
 from google.cloud import bigquery
 import matplotlib.pyplot as plt
+import streamlit as st
+import pandas as pd
+from datetime import datetime
+
 
 credentials = service_account.Credentials.from_service_account_info(
     st.secrets["gcp_service_account"]
@@ -403,6 +407,7 @@ for city in selected_cities:
                 unsafe_allow_html=True,
             )
 
+
 # Add a legend to the map
 legend_html = """
 <div style="
@@ -421,10 +426,16 @@ sweden_map.get_root().html.add_child(folium.Element(legend_html))
 # Display the map in Streamlit
 st_folium(sweden_map, width=800, height=500)
 
-
-import streamlit as st
-import pandas as pd
-from datetime import datetime
+st.markdown(
+    """
+    <style>
+    .your-class {
+        margin-bottom: 0px; /* Adjust this value */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # Helper function to load comments from a CSV file
