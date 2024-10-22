@@ -155,9 +155,6 @@ sweden_map = folium.Map(location=[62, 15], zoom_start=5)
 
 color_mapping = {"Bra": "green", "Måttlig": "yellow", "Dålig": "red"}
 
-bad_condition_cities = []
-moderate_condition_cities = []
-
 for city in selected_cities:
     lat, lon = main_cities[city]
     weather_data = fetch_weather_data(lat, lon)
@@ -245,11 +242,6 @@ for city in selected_cities:
         )
 
         color = color_mapping.get(condition, "gray")
-
-        if condition == "Dålig":
-            bad_condition_cities.append(city)
-        if condition == "Måttlig":
-            moderate_condition_cities.append(city)
 
         # Define the popup content conditionally
         popup_content = None
@@ -410,24 +402,6 @@ for city in selected_cities:
              """,
                 unsafe_allow_html=True,
             )
-
-if select_all:
-
-    # After the loop, display the list of cities with 'Bad' condition in the sidebar
-    st.sidebar.header("👎 Platser med dåliga körförhållanden")
-    if bad_condition_cities:
-        for bad_city in bad_condition_cities:
-            st.sidebar.write(f"🚗 {bad_city}")
-    else:
-        st.sidebar.write("Inga städer har för närvarande dåliga körförhållanden.")
-
-    # After the loop, display the list of cities with 'Bad' condition in the sidebar
-    st.sidebar.header("⚖️ Platser med måttlig körförhållanden")
-    if moderate_condition_cities:
-        for moderate_city in moderate_condition_cities:
-            st.sidebar.write(f"🚗 {moderate_city}")
-    else:
-        st.sidebar.write("Inga städer har för närvarande måttlig körförhållanden.")
 
 # Add a legend to the map
 legend_html = """
