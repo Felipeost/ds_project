@@ -77,7 +77,7 @@ To get a local copy up and running, follow these steps:
 
 To run the application, use the following command:
     ```bash
-    streamlit run Intro.py
+    streamlit run 1_Intro.py
 
 This will start a local server, and you can access the application in your web browser at http://localhost:8501.
 
