@@ -412,7 +412,7 @@ for city in selected_cities:
 legend_html = """
 <div style="
     position: fixed; 
-    bottom: 50px; left: 50px; width: 150px; height: 110px; 
+    bottom: 10px; left: 50px; width: 150px; height: 110px; 
     border:2px solid grey; z-index:9999; font-size:14px;
     background-color:white; padding: 10px; border-radius: 5px;">
     &nbsp; <b>Weather Condition</b><br>
@@ -425,17 +425,6 @@ sweden_map.get_root().html.add_child(folium.Element(legend_html))
 
 # Display the map in Streamlit
 st_folium(sweden_map, width=800, height=500)
-
-st.markdown(
-    """
-    <style>
-    .your-class {
-        margin-bottom: 0px; /* Adjust this value */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 
 # Helper function to load comments from a CSV file
