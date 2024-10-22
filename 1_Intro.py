@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(page_title="Polis Rapport", page_icon="🚔")
 
 # Title of the app
-st.title("Vlkommen till den Svenska Händelse- och Väderinsiktsappen!")
+st.title("Välkommen till den Svenska Händelse- och Väderinsiktsappen!")
 st.subheader("🚓 Polisen API")
 st.write(
     """            Denna app är utformad för att ge omfattande insikter om händelser som rapporteras över hela Sverige, baserat på data från polisens API. 
