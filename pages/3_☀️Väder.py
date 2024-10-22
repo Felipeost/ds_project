@@ -14,9 +14,6 @@ credentials= service_account.Credentials.from_service_account_info(
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
-client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-
-
 def count_trafikolycka(city_name):
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count
