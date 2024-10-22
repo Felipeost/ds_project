@@ -8,8 +8,9 @@ from google.oauth2 import service_account
 from google.cloud import bigquery
 import matplotlib.pyplot as plt
 
-credentials= service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"])
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"]
+)
 
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
@@ -101,9 +102,9 @@ def format_valid_time(valid_time):
 
 
 def categorize_weather(temp, wind_gust, precipitation, visibility):
-    if temp < -5 or temp > 35 or wind_gust > 15 or precipitation > 5 or visibility < 1:
+    if temp < -5 or temp > 35 or wind_gust > 25 or precipitation > 5 or visibility < 1:
         return "Dålig"
-    elif temp < 0 or wind_gust > 10 or precipitation > 2 or visibility < 2:
+    elif temp < 0 or wind_gust > 20 or precipitation > 2 or visibility < 2:
         return "Måttlig"
     else:
         return "Bra"
