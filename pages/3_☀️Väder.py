@@ -15,6 +15,7 @@ credentials = service_account.Credentials.from_service_account_info(
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
+@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def count_trafikolycka(city_name):
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count
@@ -28,6 +29,7 @@ def count_trafikolycka(city_name):
     return 0
 
 
+@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def count_trafikolycka_all():
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count_all
@@ -41,6 +43,7 @@ def count_trafikolycka_all():
     return 0
 
 
+@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def get_top_5_trafikolycka():
     query = """
     SELECT location_name, COUNT(*) AS trafikolycka_count
@@ -60,6 +63,7 @@ def get_top_5_trafikolycka():
     return cities, counts
 
 
+@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def get_main_cities_from_bigquery():
     query = """
     SELECT DISTINCT location_name, latitude, longitude
@@ -79,6 +83,7 @@ def get_main_cities_from_bigquery():
 main_cities = get_main_cities_from_bigquery()
 
 
+@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def fetch_weather_data(latitude, longitude):
     api_url = f"https://opendata-download-metanalys.smhi.se/api/category/mesan2g/version/1/geotype/point/lon/{longitude}/lat/{latitude}/data.json"
     response = requests.get(api_url)
