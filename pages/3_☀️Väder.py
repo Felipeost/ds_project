@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-
+import time
 
 credentials = service_account.Credentials.from_service_account_info(
     st.secrets["gcp_service_account"]
@@ -19,7 +19,6 @@ credentials = service_account.Credentials.from_service_account_info(
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
-@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def count_trafikolycka(city_name):
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count
@@ -33,7 +32,6 @@ def count_trafikolycka(city_name):
     return 0
 
 
-@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def count_trafikolycka_all():
     query = f"""
     SELECT COUNT(*) AS trafikolycka_count_all
@@ -47,7 +45,6 @@ def count_trafikolycka_all():
     return 0
 
 
-@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def get_top_5_trafikolycka():
     query = """
     SELECT location_name, COUNT(*) AS trafikolycka_count
@@ -67,7 +64,6 @@ def get_top_5_trafikolycka():
     return cities, counts
 
 
-@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def get_main_cities_from_bigquery():
     query = """
     SELECT DISTINCT location_name, latitude, longitude
@@ -87,7 +83,6 @@ def get_main_cities_from_bigquery():
 main_cities = get_main_cities_from_bigquery()
 
 
-@st.cache_data(ttl=3600)  # Cache the result for 1 hour
 def fetch_weather_data(latitude, longitude):
     api_url = f"https://opendata-download-metanalys.smhi.se/api/category/mesan2g/version/1/geotype/point/lon/{longitude}/lat/{latitude}/data.json"
     response = requests.get(api_url)
@@ -154,12 +149,19 @@ if select_all:
 
     st.sidebar.pyplot(fig)
 
-# Initialize Folium Map
+# Initialize Folium Map inside an empty Streamlit container
+map_container = st.empty()
 sweden_map = folium.Map(location=[62, 15], zoom_start=5)
+
+# Initialize a progress bar if 'select all' is checked
+if select_all:
+    progress_bar = st.progress(0)
+    total_cities = len(selected_cities)
 
 color_mapping = {"Bra": "green", "Måttlig": "yellow", "Dålig": "red"}
 
-for city in selected_cities:
+# Loop through each city and update the map after each one
+for idx, city in enumerate(selected_cities):
     lat, lon = main_cities[city]
     weather_data = fetch_weather_data(lat, lon)
 
@@ -269,144 +271,151 @@ for city in selected_cities:
             popup=popup_content,
         ).add_to(sweden_map)
 
-    if not select_all:
+    # Update the progress bar
+    if select_all:
+        progress_bar.progress((idx + 1) / total_cities)
 
+# Re-render the updated map in the container after each city is processed
+with map_container:
+    st_folium(sweden_map, width=800, height=500)
+
+if not select_all:
+
+    st.markdown(
+        f"""
+            <style>
+            .container {{
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            }}
+            .small-font {{
+            font-size: 28px !important;
+            }}
+            </style>
+            """,
+        unsafe_allow_html=True,
+    )
+
+    # If a single city is selected, display the traffic incident count below the map
+    if not select_all:
+        trafikolycka_count = count_trafikolycka(selected_city)
+
+    st.subheader(f"🏙️ Plats: {city} ")
+    st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
+
+    # First row: 3 columns
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
         st.markdown(
             f"""
-                 <style>
-                .container {{
-                 padding: 10px;
-                 border: 1px solid #ddd;
-                 border-radius: 5px;
-                 margin-bottom: 10px;
-                 }}
-                 .small-font {{
-                 font-size: 28px !important;
-                 }}
-                 </style>
-                 """,
+                <div class='container'>
+                <strong> 📅 Datum & Tid</strong>
+                <div class='small-font'>{formatted_date}, {formatted_time}</div>
+                </div>
+                """,
             unsafe_allow_html=True,
         )
 
-        # If a single city is selected, display the traffic incident count below the map
-        if not select_all:
-            trafikolycka_count = count_trafikolycka(selected_city)
+    with col2:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>🌡️ Temperatur</strong>
+                <div class='small-font'>{temp} °C</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        st.subheader(f"🏙️ Plats: {city} ")
-        st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
+    with col3:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>💨 Vindby</strong>
+                <div class='small-font'>{wind_gust} m/s</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        # First row: 3 columns
-        col1, col2, col3 = st.columns(3)
+    # Second row: 3 columns
+    col1_1, col2_1, col3_1 = st.columns(3)
 
-        with col1:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong> 📅 Datum & Tid</strong>
-                    <div class='small-font'>{formatted_date}, {formatted_time}</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
+    with col1_1:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>🌧️ Nederbörd</strong>
+                <div class='small-font'>{precipitation} mm</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        with col2:
-            st.markdown(
-                f"""
-                     <div class='container'>
-                     <strong>🌡️ Temperatur</strong>
-                     <div class='small-font'>{temp} °C</div>
-                     </div>
-                     """,
-                unsafe_allow_html=True,
-            )
+    with col2_1:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>❄️ Snö</strong>
+                <div class='small-font'>{snow_precipitation} mm</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        with col3:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>💨 Vindby</strong>
-                    <div class='small-font'>{wind_gust} m/s</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
+    with col3_1:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>👁️ Synlighet</strong>
+                <div class='small-font'>{visibility} km</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        # Second row: 3 columns
-        col1_1, col2_1, col3_1 = st.columns(3)
+    # Third row: 3 columns
+    col1_2, col2_2, col3_2 = st.columns(3)
 
-        with col1_1:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>🌧️ Nederbörd</strong>
-                    <div class='small-font'>{precipitation} mm</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
+    with col1_2:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>🌬️ Vindhastighet</strong>
+                <div class='small-font'>{wind_speed} m/s</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        with col2_1:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>❄️ Snö</strong>
-                    <div class='small-font'>{snow_precipitation} mm</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
+    with col2_2:
+        st.markdown(
+            f"""
+                <div class='container'>
+                <strong>☂️ Nederbördssortering</strong>
+                <div class='small-font'>{precip_sort}</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-        with col3_1:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>👁️ Synlighet</strong>
-                    <div class='small-font'>{visibility} km</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
-
-        # Third row: 3 columns
-        col1_2, col2_2, col3_2 = st.columns(3)
-
-        with col1_2:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>🌬️ Vindhastighet</strong>
-                    <div class='small-font'>{wind_speed} m/s</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
-
-        with col2_2:
-            st.markdown(
-                f"""
-                    <div class='container'>
-                    <strong>☂️ Nederbördssortering</strong>
-                    <div class='small-font'>{precip_sort}</div>
-                    </div>
-                    """,
-                unsafe_allow_html=True,
-            )
-
-        with col3_2:
-            # Use thumbs up for good condition, thumbs down for bad
-            condition_symbol = (
-                "👍" if condition == "Bra" else "👎" if condition == "Dålig" else "⚖️"
-            )
-            st.markdown(
-                f"""
-             <div class='container'>
-             <strong>🚗 Körsäkerhet</strong>
-             <div class='small-font'>{condition_symbol} {condition}</div>
-             </div>
-             """,
-                unsafe_allow_html=True,
-            )
-
+    with col3_2:
+        # Use thumbs up for good condition, thumbs down for bad
+        condition_symbol = (
+            "👍" if condition == "Bra" else "👎" if condition == "Dålig" else "⚖️"
+        )
+        st.markdown(
+            f"""
+        <div class='container'>
+        <strong>🚗 Körsäkerhet</strong>
+        <div class='small-font'>{condition_symbol} {condition}</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
 # Add a legend to the map
 legend_html = """
