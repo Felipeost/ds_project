@@ -119,14 +119,16 @@ with tabs[0]:
     # Streamlit App Title
     st.title("Körsäkerhet i Realtid ⚠️ och Väderinsikter 🌤️")
 
-    st.sidebar.header("🏙️ Platsval")
+    st.subheader("🏙️ Platsval")
 
     selected_cities = list(sorted(main_cities.keys()))
 
-    selected_city = st.sidebar.selectbox(
-        "Välj en plats", list(sorted(main_cities.keys()))
-    )
+    selected_city = st.selectbox("Välj en plats", list(sorted(main_cities.keys())))
     selected_cities = [selected_city]
+
+    trafikolycka_count = count_trafikolycka(selected_city)
+
+    st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
 
     trafikolycka_count_all = count_trafikolycka_all()
 
@@ -264,11 +266,6 @@ with tabs[0]:
                     """,
             unsafe_allow_html=True,
         )
-
-        trafikolycka_count = count_trafikolycka(selected_city)
-
-        st.subheader(f"🏙️ Plats: {city} ")
-        st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
 
         # First row: 3 columns
         col1, col2, col3 = st.columns(3)
