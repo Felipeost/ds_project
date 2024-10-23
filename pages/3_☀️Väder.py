@@ -116,52 +116,43 @@ st.title("Körsäkerhet i Realtid ⚠️ och Väderinsikter 🌤️")
 
 st.sidebar.header("🏙️ Platsval")
 
-select_all = st.sidebar.checkbox(
-    "Markera för Alla platser eller Avmarkera för en specifik plats", value=True
+selected_cities = list(sorted(main_cities.keys()))
+
+
+selected_city = st.sidebar.selectbox("Välj en plats", list(sorted(main_cities.keys())))
+selected_cities = [selected_city]
+
+
+trafikolycka_count_all = count_trafikolycka_all()
+
+st.subheader(
+    f"Totalt antal trafikolyckor som rapporterats hittills i alla platser: {trafikolycka_count_all}"
+)
+st.write(
+    "För körsäkerhetstips följ denna länk: https://trafiko.se/faktabank/halt-vaglag"
 )
 
-if select_all:
-    selected_cities = list(sorted(main_cities.keys()))
+cities, counts = get_top_5_trafikolycka()
 
-else:
-    selected_city = st.sidebar.selectbox(
-        "Välj en plats", list(sorted(main_cities.keys()))
-    )
-    selected_cities = [selected_city]
+st.sidebar.header("💥Topp 5 Platser med Flest Olyckor")
+fig, ax = plt.subplots()
+ax.bar(cities, counts, color="skyblue")
+ax.set_xlabel("Plats")
+ax.set_ylabel("Antal Olyckor")
 
-if select_all:
-    trafikolycka_count_all = count_trafikolycka_all()
+st.sidebar.pyplot(fig)
 
-    st.subheader(
-        f"Totalt antal trafikolyckor som rapporterats hittills i alla städer: {trafikolycka_count_all}"
-    )
-    st.write(
-        "För körsäkerhetstips följ denna länk: https://trafiko.se/faktabank/halt-vaglag"
-    )
-
-    cities, counts = get_top_5_trafikolycka()
-
-    st.sidebar.header("💥Topp 5 Platser med Flest Olyckor")
-    fig, ax = plt.subplots()
-    ax.bar(cities, counts, color="skyblue")
-    ax.set_xlabel("Plats")
-    ax.set_ylabel("Antal Olyckor")
-
-    st.sidebar.pyplot(fig)
-
-# Initialize Folium Map inside an empty Streamlit container
-map_container = st.empty()
+# Initialize Folium Map
 sweden_map = folium.Map(location=[62, 15], zoom_start=5)
-
-# Initialize a progress bar if 'select all' is checked
-if select_all:
-    progress_bar = st.progress(0)
-    total_cities = len(selected_cities)
 
 color_mapping = {"Bra": "green", "Måttlig": "yellow", "Dålig": "red"}
 
-# Loop through each city and update the map after each one
-for idx, city in enumerate(selected_cities):
+# Create a list to store cities with 'Bad' condition
+bad_condition_cities = []
+moderate_condition_cities = []
+
+
+for city in selected_cities:
     lat, lon = main_cities[city]
     weather_data = fetch_weather_data(lat, lon)
 
@@ -249,18 +240,13 @@ for idx, city in enumerate(selected_cities):
 
         color = color_mapping.get(condition, "gray")
 
-        # Define the popup content conditionally
-        popup_content = None
-        if select_all:
-            popup_content = folium.Popup(
-                f"""Stad 🏙️: {city} 
-            Körsäkerhet 🚗: {condition} 
-            Temp 🌡️: {temp}°C 
-            Nederbörd 🌧️: {precipitation}mm 
-            Snö ❄️: {snow_precipitation}mm 
-            Synlighet 👁️: {visibility}km""",
-                parse_html=True,
-            )
+        # Add cities with 'Bad' condition to the list
+        if condition == "Dålig":
+            bad_condition_cities.append(city)
+
+        # Add cities with 'Bad' condition to the list
+        if condition == "Måttlig":
+            moderate_condition_cities.append(city)
 
         folium.CircleMarker(
             location=(lat, lon),
@@ -268,39 +254,42 @@ for idx, city in enumerate(selected_cities):
             color=color,
             fill=True,
             fill_opacity=0.6,
-            popup=popup_content,
         ).add_to(sweden_map)
-
-    # Update the progress bar
-    if select_all:
-        progress_bar.progress((idx + 1) / total_cities)
-
-# Re-render the updated map in the container after each city is processed
-with map_container:
-    st_folium(sweden_map, width=800, height=500)
-
-if not select_all:
 
     st.markdown(
         f"""
-            <style>
+                <style>
             .container {{
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            }}
-            .small-font {{
-            font-size: 28px !important;
-            }}
-            </style>
-            """,
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin-bottom: 10px;
+                }}
+                .small-font {{
+                font-size: 28px !important;
+                }}
+                </style>
+                """,
         unsafe_allow_html=True,
     )
 
-    # If a single city is selected, display the traffic incident count below the map
-    if not select_all:
-        trafikolycka_count = count_trafikolycka(selected_city)
+    # After the loop, display the list of cities with 'Bad' condition in the sidebar
+    st.sidebar.header("👎 Platser med dåliga körförhållanden")
+    if bad_condition_cities:
+        for bad_city in bad_condition_cities:
+            st.sidebar.write(f"🚗 {bad_city}")
+    else:
+        st.sidebar.write("Inga platser har för närvarande dåliga körförhållanden.")
+
+    # After the loop, display the list of cities with 'Moderate' condition in the sidebar
+    st.sidebar.header("⚖️ Platser med måttliga körförhållanden")
+    if moderate_condition_cities:
+        for moderate_city in moderate_condition_cities:
+            st.sidebar.write(f"🚗 {moderate_city}")
+    else:
+        st.sidebar.write("Inga platser har för närvarande måttliga körförhållanden.")
+
+    trafikolycka_count = count_trafikolycka(selected_city)
 
     st.subheader(f"🏙️ Plats: {city} ")
     st.subheader(f"💥 Antal olyckor rapporterade hittills: {trafikolycka_count} ")
@@ -322,11 +311,11 @@ if not select_all:
     with col2:
         st.markdown(
             f"""
-                <div class='container'>
-                <strong>🌡️ Temperatur</strong>
-                <div class='small-font'>{temp} °C</div>
-                </div>
-                """,
+                    <div class='container'>
+                    <strong>🌡️ Temperatur</strong>
+                    <div class='small-font'>{temp} °C</div>
+                    </div>
+                    """,
             unsafe_allow_html=True,
         )
 
@@ -409,28 +398,14 @@ if not select_all:
         )
         st.markdown(
             f"""
-        <div class='container'>
-        <strong>🚗 Körsäkerhet</strong>
-        <div class='small-font'>{condition_symbol} {condition}</div>
-        </div>
-        """,
+            <div class='container'>
+            <strong>🚗 Körsäkerhet</strong>
+            <div class='small-font'>{condition_symbol} {condition}</div>
+            </div>
+            """,
             unsafe_allow_html=True,
         )
 
-# Add a legend to the map
-legend_html = """
-<div style="
-    position: fixed; 
-    bottom: 50px; left: 50px; width: 150px; height: 110px; 
-    border:2px solid grey; z-index:9999; font-size:14px;
-    background-color:white; padding: 10px; border-radius: 5px;">
-    &nbsp; <b>Weather Condition</b><br>
-    &nbsp; <i style="color:green;">&#9679;</i>&nbsp; Good<br>
-    &nbsp; <i style="color:yellow;">&#9679;</i>&nbsp; Moderate<br>
-    &nbsp; <i style="color:red;">&#9679;</i>&nbsp; Bad<br>
-</div>
-"""
-sweden_map.get_root().html.add_child(folium.Element(legend_html))
 
 # Display the map in Streamlit
 st_folium(sweden_map, width=800, height=500)
