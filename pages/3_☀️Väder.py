@@ -380,7 +380,7 @@ for city in selected_cities:
 
 
 # Display the map in Streamlit
-st_folium(sweden_map, width=800, height=500)
+st_folium(sweden_map, width=800, height=400)
 
 
 # Helper function to load comments from a CSV file
