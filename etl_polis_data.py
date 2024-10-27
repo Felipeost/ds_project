@@ -32,11 +32,16 @@ def extract_data(url):
 def transform_data(data):
     try:
         df = pd.DataFrame(data)
-        df['datetime'] = pd.to_datetime(df['datetime'])
+        
+        # Explicitly parse 'datetime' to handle potential string issues
+        df['datetime'] = pd.to_datetime(df['datetime'], errors='coerce', utc=True)
+    
+        df = df.dropna(subset=['datetime'])
         
         sweden_tz = pytz.timezone('Europe/Stockholm')
         df['datetime'] = df['datetime'].dt.tz_convert(sweden_tz)
         
+        # Additional transformations
         df['date'] = df['datetime'].dt.date
         df['time'] = df['datetime'].dt.time
         
@@ -45,7 +50,6 @@ def transform_data(data):
         df['name'] = df['name'].apply(lambda x: x.split(',')[1].strip())
         
         df['id'] = df['id'].astype('int64')
-        df['datetime'] = pd.to_datetime(df['datetime'])
         
         df[['latitude', 'longitude']] = df['location_gps'].str.split(',', expand=True)
         df['latitude'] = df['latitude'].astype(float)
@@ -63,15 +67,15 @@ def transform_data(data):
         df['date'] = pd.to_datetime(df['date'])
         df['time'] = pd.to_datetime(df['time'], format='%H:%M:%S')
 
-        df = df[df['type'] != 'Sammanfattning natt']
-        df = df[df['type'] != 'Sammanfattning kväll och natt']
-        df = df[df['type'] != 'Övrigt']
+        # Filter out specific event types
+        df = df[~df['type'].isin(['Sammanfattning natt', 'Sammanfattning kväll och natt', 'Övrigt'])]
 
         logging.info("Data transformation completed successfully.")
         return df
     except Exception as err:
         logging.error(f"An error occurred during data transformation: {err}")
         return None
+
 
 def load_data_to_bigquery(df, credentials, project_id, dataset_id, table_id):
     try:

@@ -77,3 +77,8 @@
 2024-10-21 13:30:22,196 - INFO - Data transformation completed successfully.
 2024-10-21 13:30:25,967 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
 2024-10-21 13:30:25,967 - INFO - ETL Pipeline finished. Total duration: 0:00:03.936872
+2024-10-27 11:09:54,496 - INFO - ETL Pipeline started.
+2024-10-27 11:09:54,582 - INFO - Data successfully fetched from API.
+2024-10-27 11:09:54,679 - INFO - Data transformation completed successfully.
+2024-10-27 11:09:58,782 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-27 11:09:58,782 - INFO - ETL Pipeline finished. Total duration: 0:00:04.286080
