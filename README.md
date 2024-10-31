@@ -19,7 +19,7 @@ ds_project/
 ├── .streamlit/
 │   ├── config.toml               # Configuration for Streamlit (Styles)
 │   └── secrets.toml (hidden)     # Sensitive information (BigQuery credentials)
-│
+├── reports/                      # Folder for reports
 ├── pages/                        # Directory for Streamlit pages
 │   ├── 2_Händelser.py            # Streamlit page for events
 │   └── 3_Väder.py                # Streamlit page for weather

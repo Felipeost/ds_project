@@ -82,3 +82,26 @@
 2024-10-27 11:09:54,679 - INFO - Data transformation completed successfully.
 2024-10-27 11:09:58,782 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
 2024-10-27 11:09:58,782 - INFO - ETL Pipeline finished. Total duration: 0:00:04.286080
+2024-10-28 12:34:10,814 - INFO - ETL Pipeline started.
+2024-10-28 12:34:10,896 - INFO - Data successfully fetched from API.
+2024-10-28 12:34:11,049 - INFO - Data transformation completed successfully.
+2024-10-28 12:34:16,192 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-28 12:34:16,193 - INFO - ETL Pipeline finished. Total duration: 0:00:05.378524
+2024-10-29 10:27:35,024 - INFO - ETL Pipeline started.
+2024-10-29 10:27:35,429 - INFO - Data successfully fetched from API.
+2024-10-29 10:27:35,542 - INFO - Data transformation completed successfully.
+2024-10-29 10:27:40,891 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-29 10:27:40,891 - INFO - ETL Pipeline finished. Total duration: 0:00:05.867132
+2024-10-30 11:34:01,018 - INFO - ETL Pipeline started.
+2024-10-30 11:34:01,025 - ERROR - An error occurred during data extraction: HTTPSConnectionPool(host='polisen.se', port=443): Max retries exceeded with url: /api/events (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x00000190179DB250>: Failed to resolve 'polisen.se' ([Errno 11001] getaddrinfo failed)"))
+2024-10-30 11:34:01,025 - INFO - ETL Pipeline finished. Total duration: 0:00:00.007518
+2024-10-30 11:36:12,296 - INFO - ETL Pipeline started.
+2024-10-30 11:36:12,399 - INFO - Data successfully fetched from API.
+2024-10-30 11:36:12,577 - INFO - Data transformation completed successfully.
+2024-10-30 11:36:18,397 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-30 11:36:18,397 - INFO - ETL Pipeline finished. Total duration: 0:00:06.100556
+2024-10-31 11:44:15,028 - INFO - ETL Pipeline started.
+2024-10-31 11:44:15,119 - INFO - Data successfully fetched from API.
+2024-10-31 11:44:15,226 - INFO - Data transformation completed successfully.
+2024-10-31 11:44:19,339 - INFO - Data loaded successfully to crime-in-sweden-project.Crime_in_Sweden.events.
+2024-10-31 11:44:19,339 - INFO - ETL Pipeline finished. Total duration: 0:00:04.310880
