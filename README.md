@@ -1,4 +1,4 @@
-# Project Title: Police Events and Driving Saftey app in Sweden
+# Project Title: Police Events and Driving Saftey app in Sweden ( https://policeapi.streamlit.app/ )
 
 ## Description
 This project analyzes and visualizes events in Sweden reported by the Police and shows weather and driving conditions on Swedish roads. It fetches data from the Police API and SMHI API, processes it, and presents it using Streamlit for web-based interaction. The project includes features for filtering events by category and location and provides visualizations on maps.
@@ -79,7 +79,7 @@ To run the application, use the following command:
     ```bash
     streamlit run 1_Intro.py
 
-This will start a local server, and you can access the application in your web browser at http://localhost:8501.
+This will start a local server, and you can access the application in your web browser at https://policeapi.streamlit.app/ .
 
 To run the pipeline for fetching the data from Polis API and storaging it in your BigQuery DataBase, run the file `etl_polis_data.py`
 
