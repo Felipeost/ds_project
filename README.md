@@ -1,4 +1,4 @@
-# Project Title: Event and Weather in Sweden
+# Project Title: Police Events and Driving Saftey app in Sweden
 
 ## Description
 This project analyzes and visualizes events in Sweden reported by the Police and shows weather and driving conditions on Swedish roads. It fetches data from the Police API and SMHI API, processes it, and presents it using Streamlit for web-based interaction. The project includes features for filtering events by category and location and provides visualizations on maps.
